@@ -1,0 +1,25 @@
+>>> test(2,2,5,5)
+on produit 0
+on produit 8
+on produit 3
+on produit 1
+on consomme 0
+on consomme 8
+on consomme 3
+on consomme 1
+on produit 0
+fin producteur
+on produit 3
+on produit 9
+on produit 9
+on consomme 0
+fin consommateur
+on consomme 3
+on consomme 9
+on consomme 9
+on produit 8
+on produit 2
+fin producteuron consomme
+ 8
+on consomme 2
+fin consommateur

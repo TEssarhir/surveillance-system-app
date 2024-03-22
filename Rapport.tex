@@ -1,0 +1,112 @@
+\documentclass[oneside]{report}
+\usepackage{enumitem}
+\usepackage{authoraftertitle}
+\usepackage{xcolor}
+\usepackage[french]{babel}
+\usepackage[bottom]{footmisc}
+\usepackage{mytitle,mypage}
+\usepackage{listings}
+\lstdefinestyle{mystyle}{
+    language=Python,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    basicstyle=\small\ttfamily,
+    captionpos=b,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!40!black},
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    breaklines=true,
+}
+
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{2}
+
+
+% 1ère page
+\title{Systèmes distribués S8\\TP2}
+\author{Groupe G2}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+On se propose d'étudier un système électrique composé d'un objet physique nommé armoire, ce composant électrique est conçue pour simuler la mise en charge d'un réseau électrique afin de faire des mesures sur les charges résistives \(R\), capacitives \(C\), et inductives \(L\). À titre indicatif ces charges sont pilotées par un automate \href{https://www.wago.com/fr/contrôleur/contrôleurs-pfc200/p/750-8202}{Wago 750-8202}. Plus de détails sur le contexte matériel sont fourni \href{http://internetdesenergies.blog.univ-lorraine.fr/}{ici}.
+
+
+L'objectif de ce TP est de programmer en python la partie d'acquisition des données à partir du système physique réel, ainsi qu'une partie qui permet de modifier en temps réel la configuration du système physique pour avoir des données qui évoluent au fil du temps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prise en main du code fourni}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Tout d'abord, on commence par exécuter le code fourni ci-dessous. On importe une bibliothèque \texttt{Armoire5}\footnote{Cette bibliothèque a été codée par Mr CHEVRIER Vincent, pour plus de détails vous pouvez le contactez via \href{mailto:chevrier6@univ-lorraine.fr}{mail}} qui fournie les fonctions nécessaires pour interagir avec le système électrique, ensuite on définit une fonction \texttt{pprint} qui permet d'afficher de manière plus adéquate les données mesurée. Enfin on définit une fonction \texttt{test} qui prend en argument une charge et renvoie les données qui lui sont liées, le code et son résultat est le suivant :
+
+\lstinputlisting[style=mystyle]{Annexe/A2/test5.py}
+
+\lstinputlisting[style=mystyle]{Annexe/A2/log/test5.log}
+
+Le script nous envoie donc les valeurs de toutes les grandeurs électriques souhaitées \emph{(tension \(U\), courant \(I\), résistances,\ldots)}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Modification du système physique}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Le but de ce code est de simuler des modifications aléatoires de la charge et de la source d'une armoire électronique nommée \texttt{Armoire5} pendant une durée donnée. Cette simulation est réalisée à l'aide d'une fonction nommée \texttt{simulation} qui utilise la méthode \texttt{time} pour déterminer la durée de la simulation et crée un objet \texttt{a} de type \texttt{Armoire5} pour simuler les changements de charge et de source de manière aléatoire. À chaque itération de la boucle, la méthode \texttt{toggleCharge} et la méthode \texttt{toggleSource} de l'objet \texttt{a} sont appelées pour modifier de manière aléatoire la charge et la source de l'armoire électronique. Les modifications apportées sont stockées dans les variables \texttt{c} et \texttt{s} puis affiché dans la console
+
+\lstinputlisting[style=mystyle]{Annexe/A2/sim5.py}
+
+\lstinputlisting[style=mystyle]{Annexe/A2/log/sim5.log}
+
+On voit donc que pour des paramètres \texttt{(0,30)} la fonction a effectué huit changements de charge et de source de manière aléatoire. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Récupération et mise à disposition des données}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Le but ici est de créer trois processus principaux : simulation, acquisition de données et finalement la lecture des données. Pour cela on crée trois \texttt{class} différentes
+
+%%
+\subsection{Processus simulation}
+%%
+
+Ce processus utilise la fonction \texttt{simulation} codée dans la partie précédente afin de choisir aléatoirement une charge et modifier sa position :
+
+\lstinputlisting[style=mystyle]{Annexe/A2/process_acq.py}
+
+\lstinputlisting[style=mystyle]{Annexe/A2/log/process_acq.log}
+
+%%
+\subsection{Processus acquisition de donnée}
+%%
+
+Le but final de ce code est de collecter des données à partir d'une armoire
+électronique \texttt{Armoire5} pendant une certaine durée et de stocker ces données dans une liste. Pour cela, on définit une classe d'acquisition de données appelée \texttt{acquisition} qui hérite de la classe \texttt{Thread} de la bibliothèque \texttt{threading}
+
+La classe \texttt{Acquisition} utilise la méthode \texttt{run} pour effectuer les actions d'acquisition de données. À chaque itération de la boucle, la méthode \texttt{readSecteur2} est utilisée pour lire des données à partir du secteur 2 de l'armoire électronique et ces données sont stockées dans la liste \texttt{L}. La méthode \texttt{sleep} est utilisée pour attendre un certain nombre de secondes entre chaque acquisition de données.
+
+\lstinputlisting[style=mystyle]{Annexe/A2/process_sim.py}
+
+\lstinputlisting[style=mystyle]{Annexe/A2/log/process_sim.log}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

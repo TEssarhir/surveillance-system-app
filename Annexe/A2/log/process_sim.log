@@ -1,0 +1,3 @@
+>>> x = simulation(3,5) ; x.run()
+modification de la charge 1 mise sur source 2
+modification de la charge 3 mise sur source 2
